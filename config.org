@@ -1,0 +1,131 @@
+#+TITLE: Doom Emacs Config
+#+AUTHOR: Mateus Lira Guilhermino Carmagnini
+#+OPTIONS: toc:2
+#+PROPERTY: header-args  :results silent
+#+PROPERTY: header-args:emacs-lisp :tangle yes
+
+* Table of Contents :toc:
+- [[#personal-information][Personal Information]]
+- [[#ui][UI]]
+  - [[#logo][Logo]]
+  - [[#fonts][Fonts]]
+  - [[#theme][Theme]]
+- [[#org-mode][Org Mode]]
+  - [[#general-settings][General Settings]]
+  - [[#org-tempo][Org Tempo]]
+  - [[#org-noter][Org Noter]]
+  - [[#org-bullets][Org Bullets]]
+  - [[#org-ol][Org-ol]]
+- [[#coding][Coding]]
+  - [[#copilot][Copilot]]
+
+* Personal Information
+
+#+begin_src emacs-lisp
+(setq user-full-name "Mateus Lira Guilhermino Carmagnini"
+      user-mail-address "mateuscarmagnini@gmail.com")
+#+end_src
+
+* UI
+** Logo
+
+#+begin_src emacs-lisp :tangle yes
+(setq fancy-splash-image (concat doom-user-dir "splash.png"))
+#+end_src
+
+** Fonts
+
+#+begin_src emacs-lisp :tangle yes
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 15))
+#+end_src
+
+** Theme
+
+#+begin_src emacs-lisp
+(setq doom-theme 'doom-acario-light) ;;light theme
+(setq doom-theme 'doom-one)
+#+end_src
+
+* Org Mode
+
+** General Settings
+
+#+begin_src emacs-lisp
+(setq org-directory "~/Org/"
+      org-roam-directory "~/Org/roam")
+#+end_src
+
+** Org Tempo
+
+Set up org tempo and add some templates
+
+#+begin_src emacs-lisp :tangle yes
+
+(require 'org-tempo)
+
+(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("py" . "src python"))
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+
+
+#+end_src
+
+** Org Noter
+
+Take notes from PDF files
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-noter)
+#+end_src
+
+** Org Bullets
+
+Make the heading symbols prettier
+
+#+begin_src emacs-lisp
+(setq org-superstar-headline-bullets-list '("◇" "◆" "◈" "◊" "◊"))
+#+end_src
+
+
+** Org-ol
+
+Outlines inside org mode
+
+#+begin_src emacs-lisp
+(use-package! org-ol-tree
+  :after org
+  :commands org-ol-tree
+  :hook (org-ol-tree-mode . visual-line-mode)
+  :config
+  (setq org-ol-tree-ui-window-auto-resize nil
+        org-ol-tree-ui-window-max-width 0.3
+        org-ol-tree-ui-window-position 'left))
+(map! :map org-mode-map
+      :after org
+      :localleader
+      :desc "Outline" "O" #'org-ol-tree)
+#+end_src
+
+
+* Coding
+** Copilot
+
+Setup
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! copilot
+  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
+#+end_src
+
+
+Accept completion from copilot and fallback to company
+
+#+begin_src emacs-lisp
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+#+end_src
